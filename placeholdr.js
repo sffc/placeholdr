@@ -22,48 +22,46 @@
  * THE SOFTWARE.
  */
 
-(function($){
+(function($, ns, placeholderAttribute, origValFn){
 	// Utility functions
 	var putPlaceholder = function(){
 		var $this = $(this);
-		if (!$this.val()) {
-			$this.addClass("placeholdr");
+		if (!$this[origValFn]()) {
+			$this.addClass(ns);
 			if ($this.attr("type") === "password") {
 				$this.attr("type", "text");
-				$this.data("placeholdr-pwd", true);
+				$this.data(ns+"-pwd", true);
 			}
-			$this.val($this.attr("placeholder"));
+			$this[origValFn]($this.attr(placeholderAttribute));
 		}
 	};
 	var clearPlaceholder = function(){
 		var $this = $(this);
-		$this.removeClass("placeholdr");
-		if ($this.data("placeholdr-pwd")) {
+		$this.removeClass(ns);
+		if ($this.data(ns+"-pwd")) {
 			$this.attr("type", "password");
 		}
-		if ($this.val() === $this.attr("placeholder")){
-			$this.val("");
+		if ($this[origValFn]() === $this.attr(placeholderAttribute)){
+			$this[origValFn]("");
 		}
 	};
 	var clearPlaceholdersInForm = function(){
 		$(this).find("input").each(function() {
-			if ($(this).val() === $(this).attr("placeholder")) {
-				$(this).val("");
-			}
+			if ($(this).data(ns)) clearPlaceholder.call(this);
 		});
 	};
 
 	$.fn.placeholdr = function(){
 		// Don't evaluate the polyfill if the browser supports placeholders
-		//if ("placeholder" in document.createElement("input")) return;
+		if (placeholderAttribute in document.createElement("input")) return;
 
 		// Find and iterate through all inputs that have a placeholder attribute
 		$(this).find("input[placeholder]").each(function(){
 			var $this = $(this);
 
 			// leave now if we've polyfilled this element before
-			if ($this.data("placeholdr")) return;
-			$this.data("placeholdr", true);
+			if ($this.data(ns)) return;
+			$this.data(ns, true);
 
 			// put the placeholder into the value
 			putPlaceholder.call(this);
@@ -79,11 +77,27 @@
 			var $this = $(this);
 
 			// leave now if we've polyfilled this element before
-			if ($this.data("placeholdr")) return;
-			$this.data("placeholdr", true);
+			if ($this.data(ns)) return;
+			$this.data(ns, true);
 
 			$this.submit(clearPlaceholdersInForm);
 		});
+	};
+
+	// Overwrite the existing jQuery val() function
+	$.fn[origValFn] = $.fn.val;
+	$.fn.val = function(txt){
+		var $this = $(this);
+		if ($.type(txt) === "undefined"
+		 && $this.data(ns)
+		 && $this[origValFn]() === $this.attr(placeholderAttribute)
+		 ){
+			return "";
+		}
+		if ($.type(txt) === "string") {
+			clearPlaceholder.call(this);
+		}
+		return $.fn[origValFn].apply(this, arguments);
 	};
 
 	// Evaluate the script on page ready
@@ -93,4 +107,4 @@
 
 	// Add default CSS rule
 	document.write("<style>.placeholdr{color:#AAA;}</style>");
-})(jQuery);
+})(jQuery, "placeholdr", "placeholder", "placeholdrVal");

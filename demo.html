@@ -6,7 +6,16 @@
 	<script type="text/javascript" src="placeholdr.js"></script>
 </head>
 <body>
-	<input type="text" placeholder="Username" />
-	<input type="password" placeholder="Password" />
+	<input type="text" id="username" placeholder="Username" />
+	<input type="password" id="password" placeholder="Password" />
+	<button id="values">Display Values</button>
 </body>
+
+<script type="text/javascript">
+$("#values").click(function(){
+	alert("Username Value: " + $("#username").val());
+	alert("Password Value: " + $("#password").val());
+});
+</script>
+
 </html>
