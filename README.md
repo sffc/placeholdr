@@ -1,7 +1,9 @@
 Placeholdr
 ==========
 
-**Placeholdr** is a super-lightweight drop-in jQuery-based polyfill to support the HTML5 placeholder attribute in IE 9 and other non-compliant browsers.  Minified size is *less than 1 KB*!
+**Placeholdr** is a super-lightweight drop-in jQuery-based polyfill to support the HTML5 placeholder attribute in IE 9 and other non-compliant browsers.  Minified size is less than 1 KB!
+
+There are probably over a dozen HTML5 placeholder polyfills in the wild.  Some of them take care of the form submission issue, others take care of the password issue, and others require you to do extra work in order to install them in your site.  The goal with Placeholdr is to make a one-stop drop-in solution to solve your HTML5 placeholder compatibility issues while at the same time patching for the common pitfalls in placeholder polyfills.
 
 Placeholdr is licensed under the X11 open-source license.
 
