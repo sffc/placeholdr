@@ -20,8 +20,6 @@ It's really that simple.
 - Add this repository as a subrepo to your project and symlink `placeholder.min.js` to your javascript assets folder.  This enables you to easily receive updates.
 - Download the `placeholder.min.js` file directly to your assets folder.  Don't forget to check for updates by visiting this page every few months.
 
-- Automatically
-
 ### Dynamic DOM Manipulation
 
 Placeholdr exposes a `placeholdr()` jQuery function.  When called on a jQuery object, Placeholdr searches all decendants of the object for inputs that have a `placeholder` attribute.
