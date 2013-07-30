@@ -39,3 +39,7 @@ By default, Placeholdr colors the placeholder text gray #AAA.  If you would like
     }
 
 Note that this CSS must be included *after* the Placeholdr library.  If this is not possible, add the `!important` flag to your color declaration.
+
+## Contributing
+
+Fork this repository on Github, make your changes, and submit a pull request.  Feel free to add your name to the copyright.  I use the [Closure Compiler](http://closure-compiler.appspot.com/home) on "Simple" mode to minify the JavaScript.
