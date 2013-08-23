@@ -46,7 +46,7 @@
 		}
 	};
 	var clearPlaceholdersInForm = function(){
-		$(this).find("input").each(function() {
+		$(this).find("["+placeholderAttribute+"]").each(function() {
 			if ($(this).data(ns)) clearPlaceholder.call(this);
 		});
 	};
@@ -56,7 +56,7 @@
 		if (placeholderAttribute in document.createElement("input")) return;
 
 		// Find and iterate through all inputs that have a placeholder attribute
-		$(this).find("input[placeholder]").each(function(){
+		$(this).find("["+placeholderAttribute+"]").each(function(){
 			var $this = $(this);
 
 			// leave now if we've polyfilled this element before
