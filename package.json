@@ -1,11 +1,11 @@
 {
   "name": "Placeholdr",
-  "version": "1.0.0",
-  "description": "Super-lightweight drop-in jQuery-based polyfill for the HTML5 placeholder attribute",
+  "version": "1.1.0",
+  "description": "Lightweight drop-in jQuery-based polyfill for the HTML5 placeholder attribute",
   "main": "placeholdr.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vote539/placeholdr.git"
+    "url": "https://github.com/SamPlacette/placeholdr.git"
   },
   "keywords": [
     "placeholder",
@@ -14,6 +14,7 @@
     "ie"
   ],
   "author": "Shane Carr",
+  "contributors": "Sam Placette",
   "license": "X11",
   "readmeFilename": "README.md"
 }
