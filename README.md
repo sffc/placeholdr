@@ -9,6 +9,12 @@ Placeholdr is licensed under the X11 open-source license.
 
 This version of Placeholdr was forked from the original author's git project at https://github.com/vote539/placeholdr. A bunch of options were added and some of the convenient auto-initialize behavior was removed in a series of backwards-incompatible changes. This version may continue to evolve in order to meet specialized needs of its users. If you are looking for a simpler HTML5 placeholder plugin, the original version is highly recommended.
 
+### Why use this library? Top 3 reasons
+
+* Supports both the explicit HTML 5 spec and the unofficial behavior as implemented by Chrome, Firefox, and Safari. Behavior can be applied to older clients that don't support the behavior, and to newer clients to override the native implementation. Ensure a consistent experience for all users of your site in all clients.
+* Uses input values rather than positioned spans. Less elegant, sure, but also less problematic to style consistently.
+* Despite my best efforts at feature creep, it's still very short and simple. Only one source file, easy to plug in to your project and easy to modify to fit your needs.
+
 ## Basic Usage
 
 Download `placeholdr.min.js` to your static assets folder.  Then put this in your HTML5 document:
@@ -23,12 +29,16 @@ Placeholdr exposes a `placeholdr()` jQuery function.  When called on a jQuery ob
         $(document).placeholdr();
     });
 
+#### Initialization Options
+
+See the source code for available options.
+
 ## Advanced Usage
 
 ### Installation
 
-- Add this repository as a subrepo to your project and symlink `placeholder.min.js` to your javascript assets folder.  This enables you to easily receive updates.
-- Download the `placeholder.min.js` file directly to your assets folder.  Don't forget to check for updates by visiting this page every few months.
+- Add this repository as a subrepo to your project and symlink `placeholder.js` to your javascript assets folder.  This enables you to easily receive updates.
+- Download the `placeholder.js` file directly to your assets folder.  Don't forget to check for updates by visiting this page every few months.
 
 ### Dynamic DOM manipulation
 
@@ -64,4 +74,11 @@ In only IE8 and lower, the placeholder text appears as dots.  This can be fixed 
 
 ## Contributing
 
-Fork this repository on Github, make your changes, and submit a pull request.  Feel free to add your name to the copyright.  I use the [Closure Compiler](http://closure-compiler.appspot.com/home) on "Simple" mode to minify the JavaScript.
+Fork this repository on Github, make your changes, and submit a pull request.  Feel free to add your name to the copyright.
+
+## Wish list
+
+* Force caret to always be at beginning of placeholder text in clear-on-keypress mode
+* Submit pull request back to Placeholdr project. Needs smarter initialization logic so lib can be initialized on page load by default, but also easily disable the auto-startup logic
+* Better handling of styles / classes
+* Update readme with advanced init options
