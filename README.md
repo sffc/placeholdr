@@ -78,7 +78,6 @@ Fork this repository on Github, make your changes, and submit a pull request.  F
 
 ## Wish list
 
-* Force caret to always be at beginning of placeholder text in clear-on-keypress mode
 * Submit pull request back to Placeholdr project. Needs smarter initialization logic so lib can be initialized on page load by default, but also easily disable the auto-startup logic
 * Better handling of styles / classes
 * Update readme with advanced init options
