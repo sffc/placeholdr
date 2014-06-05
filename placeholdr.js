@@ -53,7 +53,7 @@
 
 	$.fn.placeholdr = function(){
 		// Don't evaluate the polyfill if the browser supports placeholders
-		if (placeholderAttribute in document.createElement("input")) return;
+		if (placeholderAttribute in document.createElement("input")) return this;
 
 		// Find and iterate through all inputs that have a placeholder attribute
 		$(this).find("["+placeholderAttribute+"]").each(function(){
