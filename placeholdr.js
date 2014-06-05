@@ -82,6 +82,8 @@
 
 			$this.submit(clearPlaceholdersInForm);
 		});
+		
+		return this;
 	};
 
 	// Overwrite the existing jQuery val() function
