@@ -1,7 +1,7 @@
 /*
- * Copyright (c) 2013 Shane Carr
+ * Copyright (c) 2013 Shane Carr and Sam Placette
  *
- * https://github.com/vote539/placeholdr
+ * https://github.com/SamPlacette/placeholdr
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,53 +22,131 @@
  * THE SOFTWARE.
  */
 
-(function($, ns, placeholderAttribute, origValFn){
+(function($, ns, placeholderAttribute, origValFn, alternatePlaceholderAttribute){
 	// Utility functions
+	var findPlaceholderInputs = function () {
+		var $this = $(this);
+		return $this.find("["+placeholderAttribute+"]," +
+											"["+alternatePlaceholderAttribute+"]");
+	};
+
+	var getPlaceholderText = function () {
+		var $this = $(this);
+		return ($this.attr(placeholderAttribute) ||
+						$this.attr(alternatePlaceholderAttribute));
+	};
+
+	var setCursorPositionAtStart = function () {
+		if (typeof this.selectionStart == "number") {
+			this.selectionStart = 0;
+			this.selectionEnd = 0;
+		}
+		else if (typeof this.createTextRange != "undefined") {
+			var range = this.createTextRange();
+			range.collapse(true);
+			range.moveStart('character', 0);
+			range.moveEnd('character', 0);
+			range.select();
+		}
+	};
+
 	var putPlaceholder = function(){
 		var $this = $(this);
+		if ($this.hasClass(ns)) { return; } // idempotent
 		if (!$this[origValFn]()) {
 			$this.addClass(ns);
 			if ($this.attr("type") === "password") {
 				$this.attr("type", "text");
 				$this.data(ns+"-pwd", true);
 			}
-			$this[origValFn]($this.attr(placeholderAttribute));
+			$this[origValFn](getPlaceholderText.call(this));
+			// disable selecting range and caret position within the placeholder text
+			// TODO this little snippet needs more testing (only IE9 and IE10 so far)
+			$this.on('mouseup', setCursorPositionAtStart)
+					 .on('selectstart', false);
+			if ($this.is(':focus')) {
+				setCursorPositionAtStart.call(this);
+			}
 		}
 	};
+
 	var clearPlaceholder = function(){
 		var $this = $(this);
 		$this.removeClass(ns);
 		if ($this.data(ns+"-pwd")) {
 			$this.attr("type", "password");
 		}
-		if ($this[origValFn]() === $this.attr(placeholderAttribute)){
+		if ($this[origValFn]() === getPlaceholderText.call(this)){
 			$this[origValFn]("");
 		}
+		// re-enable selecting range and caret position within the input text
+		$this.off('mouseup', setCursorPositionAtStart)
+				 .off('selectstart', false);
 	};
+
 	var clearPlaceholdersInForm = function(){
-		$(this).find("["+placeholderAttribute+"]").each(function() {
+		findPlaceholderInputs.call(this).each(function() {
 			if ($(this).data(ns)) clearPlaceholder.call(this);
 		});
 	};
 
-	$.fn.placeholdr = function(){
+	// options: Object (optional)
+	//	options.preserveOnFocus: Boolean. If truthy, preserve placeholder text
+	//																		on focus (hide on keypress instead)
+	//	options.overrideNative: Boolean. If truthy, override native placeholder
+	$.fn.placeholdr = function(options){
+		// ensure options exists (avoid null reference errors)
+		options || (options = {});
 		// Don't evaluate the polyfill if the browser supports placeholders
-		if (placeholderAttribute in document.createElement("input")) return;
+		// unless an option specifies to override the native implementation
+		var overrideNative = options.overrideNative || false;
+		if (placeholderAttribute in document.createElement("input") &&
+				! overrideNative
+		) {
+			return;
+		}
 
-		// Find and iterate through all inputs that have a placeholder attribute
-		$(this).find("["+placeholderAttribute+"]").each(function(){
+		// Find and iterate through all inputs with a native placeholder attribute
+		$(this).find("["+placeholderAttribute+"]").each(function() {
 			var $this = $(this);
 
-			// leave now if we've polyfilled this element before
+			// leave now if we've polyfilled this element before (idempotent)
 			if ($this.data(ns)) return;
 			$this.data(ns, true);
+
+			if (overrideNative) {
+				// copy original placeholder text to alternate location
+				$this.attr(alternatePlaceholderAttribute,
+									 $this.attr(placeholderAttribute));
+				// clear native placeholder attr to disable native implementation
+				$this.attr(placeholderAttribute, '');
+			}
 
 			// put the placeholder into the value
 			putPlaceholder.call(this);
 
-			// handle focus and blur events
-			$this.focus(clearPlaceholder);
-			$this.blur(putPlaceholder);
+			var putPlaceholderHandler = function (evt) {
+				var target = this;
+				// set putPlaceholder to execute in near future in order to catch
+				// IE10 clear event
+				setTimeout(function () {
+					putPlaceholder.call(target, evt);
+				}, 25);
+			};
+			// just for consistency, define a handler for clear too
+			var clearPlaceholderHandler = clearPlaceholder;
+
+			if (options && options.preserveOnFocus) {
+				// clear placeholder when characters are entered
+				$this.on('keypress', clearPlaceholderHandler)
+				// restore placeholder when input is cleared
+						 .on('blur change mouseup keyup', putPlaceholderHandler);
+			}
+			else {
+				// handle focus and blur events
+				$this.focus(clearPlaceholderHandler);
+				$this.blur(putPlaceholderHandler);
+			}
 		});
 
 		// Find and iterate through all form elements in order to prevent
@@ -76,12 +154,19 @@
 		$(this).find("form").each(function(){
 			var $this = $(this);
 
-			// leave now if we've polyfilled this element before
+			// leave now if we've polyfilled this element before (idempotent)
 			if ($this.data(ns)) return;
 			$this.data(ns, true);
 
 			$this.submit(clearPlaceholdersInForm);
 		});
+	};
+
+	// A convenience method to provide a common interface for consumers to
+	// get placeholder text value, regardless of whether implementation is
+	// native or via placeholdr library:
+	$.fn.getPlaceholderText = function () {
+		return getPlaceholderText.call(this);
 	};
 
 	// Overwrite the existing jQuery val() function
@@ -90,7 +175,7 @@
 		var $this = $(this);
 		if ($.type(txt) === "undefined"
 		 && $this.data(ns)
-		 && $this[origValFn]() === $this.attr(placeholderAttribute)
+		 && $this[origValFn]() === getPlaceholderText.call(this)
 		 ){
 			return "";
 		}
@@ -100,11 +185,8 @@
 		return $.fn[origValFn].apply(this, arguments);
 	};
 
-	// Evaluate the script on page ready
-	$(function(){
-		$(document).placeholdr();
-	});
-
 	// Add default CSS rule
-	document.write("<style>.placeholdr{color:#AAA;}</style>");
-})(jQuery, "placeholdr", "placeholder", "placeholdrVal");
+	document.write("<style>." + ns + "{color:#AAA;}</style>");
+
+// $, ns, placeholderAttribute, origValFn, alternatePlaceholderAttribute
+})(jQuery, "placeholdr", "placeholder", "placeholdrVal", "placeholdr");
