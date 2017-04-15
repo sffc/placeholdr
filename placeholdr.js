@@ -96,10 +96,15 @@
 		 ){
 			return "";
 		}
-		if ($.type(txt) === "string") {
+		var isstr = $.type(txt) === "string";
+		if (isstr) {
 			clearPlaceholder.call(this);
 		}
-		return $.fn[origValFn].apply(this, arguments);
+		var ret = $.fn[origValFn].apply(this, arguments);
+		if (isstr && !txt) {
+			putPlaceholder.call(this);
+		}
+		return ret;
 	};
 
 	// Evaluate the script on page ready
